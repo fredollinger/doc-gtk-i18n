@@ -1,0 +1,20 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Chapter 3. Setting Up a Working Linux System for Internationalization</title><meta name="generator" content="DocBook XSL Stylesheets V1.75.2"><link rel="home" href="index.html" title="GTK Internationalization For the Embedded Device"><link rel="up" href="index.html" title="GTK Internationalization For the Embedded Device"><link rel="prev" href="ch02.html" title="Chapter 2. Setting Up a Project for Internationalization"><link rel="next" href="ch03s02.html" title="Language Support By Hand"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Chapter 3. Setting Up a Working Linux System for Internationalization</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch02.html">Prev</a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="ch03s02.html">Next</a></td></tr></table><hr></div><div class="chapter" title="Chapter 3. Setting Up a Working Linux System for Internationalization"><div class="titlepage"><div><div><h2 class="title"><a name="system_chap"></a>Chapter 3. Setting Up a Working Linux System for Internationalization</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="ch03.html#id2894647">Language Support The Easy Way</a></span></dt><dt><span class="section"><a href="ch03s02.html">Language Support By Hand</a></span></dt></dl></div><div class="section" title="Language Support The Easy Way"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="id2894647"></a>Language Support The Easy Way</h2></div></div></div><p>
+If you do all the other steps properly, but you do not have the proper locales
+support in your Linux system, gettext() still won't work.
+</p><p>
+Most modern Linux distros allow you to click install a locale. For example, in Ubuntu Lucid, you merely go to Start-&gt;System-&gt;Administration-&gt;Language Support to install and
+configure the proper language.
+</p><p>
+To find out what support you all ready have installed you may do:
+</p><pre class="programlisting">
+locale -a
+</pre><p>
+To test this change, you may do:
+</p><pre class="programlisting">
+export LANG="es_US.utf8"
+</pre><p>
+Now every program, that has US Spanish support, will talk to you in Spanish when 
+invoked from that console.
+</p><p>
+If you have accomplished this, you are done and may skip the rest of this chapter, otherwise, read on.
+</p></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch02.html">Prev</a> </td><td width="20%" align="center"> </td><td width="40%" align="right"> <a accesskey="n" href="ch03s02.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Chapter 2. Setting Up a Project for Internationalization </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> Language Support By Hand</td></tr></table></div></body></html>

@@ -1,0 +1,46 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Adding Internationalization to an Existing Project</title><meta name="generator" content="DocBook XSL Stylesheets V1.75.2"><link rel="home" href="index.html" title="GTK Internationalization For the Embedded Device"><link rel="up" href="ch04.html" title="Chapter 4. Changes to C Sources"><link rel="prev" href="ch04.html" title="Chapter 4. Changes to C Sources"><link rel="next" href="ch04s03.html" title="Additional Notes on GTK"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Adding Internationalization to an Existing Project</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch04.html">Prev</a> </td><th width="60%" align="center">Chapter 4. Changes to C Sources</th><td width="20%" align="right"> <a accesskey="n" href="ch04s03.html">Next</a></td></tr></table><hr></div><div class="section" title="Adding Internationalization to an Existing Project"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="id2894757"></a>Adding Internationalization to an Existing Project</h2></div></div></div><p>
+	At the top of the project, include the following:
+	</p><pre class="programlisting">
+#include &lt;libintl.h&gt;
+#include &lt;locale.h&gt;
+#define _(STRING)    gettext(STRING)
+	</pre><p>
+	Aside from boilerplate includes, we make a shortcut for ourselves to save a lot of 
+	typing. Plus, the default command to grab important strings uses this.
+	</p><p>
+	Next, in the initialization part of the program--usually near main()--you must 
+	initialize locale:
+	</p><pre class="programlisting">
+setlocale( LC_ALL, "" );
+bindtextdomain( "hello", "/usr/local/share/po" );
+textdomain( "hello" );
+	</pre><p>
+	The first line will set the locale to the default.
+	If we wanted to hard code a language, such as our Americanized version of
+	Spanish as used in the example we can put in the code between the quotes:
+	</p><pre class="programlisting">
+setlocale( LC_ALL, "es_ES.utf8" );
+	</pre><p>
+	The second line uses our domain, which is "hello", and it sets the top level directory where our po files live. Note that we have to have our installer place our po (and mo) directory tree in the install path. Here we are using the default linux location.
+	</p><p>
+	Finally, the last line seems redundant. Just make sure the domain (hello) matches the one in the line above, and we are done.
+	</p><p>
+	We all we have to do is to find all the strings that we want to translate and wrap it with:
+	</p><pre class="programlisting">
+	_("");
+	</pre><p>
+	For example:
+	</p><pre class="programlisting">
+	printf( _( "Hello, world!\n" ) );
+	</pre><p>
+	Now we can try the program. If we keep the locale the default, we get the 
+	traditional, "Hello world!". However, if we set the locale to es_US.utf8
+	either in the source code or by changing the lang environment variable 
+	in our bash shell:
+	</p><pre class="programlisting">
+	export LANG="es_US.utf8"
+	</pre><p>
+	Now we can rerun our program, and the real fun begins: "Hola Munda!" 
+	The sample program listing goes both ways to demonstrate that one can
+	change locale dynamically while a program runs.
+	</p></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch04.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="ch04.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="ch04s03.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Chapter 4. Changes to C Sources </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> Additional Notes on GTK</td></tr></table></div></body></html>

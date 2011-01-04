@@ -1,0 +1,18 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Additional Notes on GTK</title><meta name="generator" content="DocBook XSL Stylesheets V1.75.2"><link rel="home" href="index.html" title="GTK Internationalization For the Embedded Device"><link rel="up" href="ch04.html" title="Chapter 4. Changes to C Sources"><link rel="prev" href="ch04s02.html" title="Adding Internationalization to an Existing Project"><link rel="next" href="ch05.html" title="Chapter 5. Debugging Internationalization"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Additional Notes on GTK</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch04s02.html">Prev</a> </td><th width="60%" align="center">Chapter 4. Changes to C Sources</th><td width="20%" align="right"> <a accesskey="n" href="ch05.html">Next</a></td></tr></table><hr></div><div class="section" title="Additional Notes on GTK"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="id2890227"></a>Additional Notes on GTK</h2></div></div></div><p>
+	GTK is a bit more difficult to deal with regarding internationalization.	
+	</p><p>
+	First of all, in all the international C files, you need to add this:
+	</p><pre class="programlisting">
+	#include &lt;glib/gi18n.h&gt;
+	</pre><p>
+	Fortunately, that's it. There are no other headers nor any defines you need to do
+	for underscore and so on so skip all that junk.
+	</p><p>
+	However, threading is often a mess, and you need to be careful where you actually bindtext() and textdomain(). I found that right before gtk_init() works for me, but then I setlocale() after this. I don't know why this is so, but this is the only thing that worked after a lot of trial and error.
+	</p><p>
+	Finally, you need this incantation for GTKBuilder GUI elements made in glade to be international. Note that I found that this has to be done after gtk_init(). 
+	</p><pre class="programlisting">
+	gtk_builder_set_translation_domain (Builder, "domain");
+	</pre><p>
+	Where domain is the domain you have been using for textdomain and bindtextdomain, and Builder is obviously your GTKBuilder object.
+	</p></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch04s02.html">Prev</a> </td><td width="20%" align="center"><a accesskey="u" href="ch04.html">Up</a></td><td width="40%" align="right"> <a accesskey="n" href="ch05.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Adding Internationalization to an Existing Project </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> Chapter 5. Debugging Internationalization</td></tr></table></div></body></html>

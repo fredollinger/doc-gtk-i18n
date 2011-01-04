@@ -1,0 +1,38 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Files For Internationization</title><meta name="generator" content="DocBook XSL Stylesheets V1.75.2"><link rel="home" href="index.html" title="GTK Internationalization For the Embedded Device"><link rel="up" href="index.html" title="GTK Internationalization For the Embedded Device"><link rel="prev" href="apa.html" title="Appendix A. Other References Books and Articles"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Files For Internationization</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="apa.html">Prev</a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> </td></tr></table><hr></div><div class="glossary" title="Files For Internationization"><div class="titlepage"><div><div><h2 class="title"><a name="id2938882"></a>Files For Internationization</h2></div></div></div><p></p><div class="glossdiv" title="Command Line Utilities"><h3 class="title">Command Line Utilities</h3><dl><dt><a name="locale"></a>locale</dt><dd><p>
+A binary executable that writes information about the current locale environment, or
+all locales, to standard output.
+</p></dd><dt><a name="iconv"></a>iconv</dt><dd><p>
+The iconv program converts text from one encoding to another encoding.
+</p></dd><dt><a name="localedef"></a>localedef</dt><dd><p>
+A binary executable that  reads  the indicated charmap and input files,
+compiles them to a binary form quickly usable by the locale(7) functions in
+the  C  library.
+</p></dd><dt><a name="locale-gen"></a>locale-gen</dt><dd><p>
+A shell script that generates locales files.
+</p></dd></dl></div><div class="glossdiv" title="Config Files and Directories"><h3 class="title">Config Files and Directories</h3><dl><dt><a name="locale-archive"></a>/usr/lib/locale/locale-archive</dt><dd><p> 
+A single file which contains all the locale data information on a system. The
+alternative is a deep tree where individual files are stored under
+<code class="filename"> 
+/usr/lib/locale/locale_name/LC_*
+</code> 
+</p></dd><dt><a name="charmaps_gloss"></a>/usr/share/i18n/charmaps</dt><dd><p> 
+Default path where the charmaps files live.
+</p></dd><dt><a name="locale_gloss"></a>/usr/share/i18n/locale</dt><dd><p> 
+Default path where the locale files live.
+</p></dd><dt><a name="usr_lib_locale"></a>/usr/lib/locale</dt><dd><p> 
+Where the generated files for the local live. Copying these should ensure the locale.
+</p></dd></dl></div><div class="glossdiv" title="Tools"><h3 class="title">Tools</h3><dl><dt><a name="gettext"></a>gettext</dt><dd><p>
+		A set of tools that provides a framework to help
+other GNU packages produce multi-lingual messages. These tools include a set of
+conventions about how programs should be written to support message catalogs, a
+directory and file naming organization for the message catalogs themselves, a
+runtime library supporting the retrieval of translated messages, and a few
+stand-alone programs to massage in various ways the sets of translatable
+strings, or already translated strings.
+  </p></dd></dl></div><div class="glossdiv" title="Ubuntu Packages"><h3 class="title">Ubuntu Packages</h3><dl><dt><a name="locale_deb"></a>locale</dt><dd><p>
+This package provides support for localized environments (locales). It installs character and transliteration maps, provides the POSIX locale definition and provides common scripts for language pack handling.
+
+The actual locale definitions are not part of this package, these are shipped in the language packs and are installed and removed automatically. 
+  </p></dd><dt><a name="localepurge_deb"></a>localepurge</dt><dd><p>
+This is a script to recover disk space wasted for unneeded locales, Gnome/KDE localizations and localized man pages. Depending on the installation, it is possible to save some 200, 300, or even more mega bytes of disk space dedicated for localization you will most probably never have any use for. It is run automagically upon completion of any apt installation actions. 
+  </p></dd></dl></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="apa.html">Prev</a> </td><td width="20%" align="center"> </td><td width="40%" align="right"> </td></tr><tr><td width="40%" align="left" valign="top">Appendix A. Other References Books and Articles </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> </td></tr></table></div></body></html>

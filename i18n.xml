@@ -1,0 +1,739 @@
+<?xml version="1.0"?> <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN" "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [ ]>
+<book>
+	<title>GTK Internationalization For the Embedded Device</title>
+
+<bookinfo>
+<author>
+  <honorific>Mr</honorific>
+  <firstname>Fred</firstname>
+  <surname>Ollinger</surname>
+  <affiliation>
+    <orgname>Seektech, Inc.</orgname>
+    <orgdiv>Software</orgdiv>
+  </affiliation>
+</author>
+</bookinfo>
+
+<chapter id='install_chap'>
+<title>Installing Linux Internationalization Support In Embedded Space</title>
+<para>
+Internationalization support comes with most distros, so it is actually not necessary to
+install it.
+</para>
+<para>
+These instructions are for embedded environments where one has to have the minimal install.
+</para>
+
+	<section>
+    <title>Obtain the Files</title>
+    <orderedlist numeration="arabic">
+
+	<listitem><para>
+	Put the 
+	<application>	
+	localedef
+	</application>	
+	binary into 
+	<filename>
+	/usr/sbin
+	</filename>
+	</para></listitem>
+
+	<listitem><para>
+	Obtain the appropriate 
+	<filename>
+	i18n
+	</filename>
+	tree for your distro and place it in
+	<filename>
+	/usr/share/i18n
+	</filename>
+	</para></listitem>
+
+	</orderedlist></section>
+
+	<section>
+    <title>Perform the Incantations</title>
+
+	<para>
+	First, you need to figure out if the system is set up properly. You'd know that it is
+	not if you 
+	<application>
+	localedef
+	</application> can't find the proper directory when you try to generate a locale.
+	For our purposes, we want to make sure ahead of time.
+	</para>
+
+	<para><programlisting>
+	localedef --help
+	</programlisting></para>
+
+	<para>
+	When I run this, I get the following:
+	</para>
+
+	<para><programlisting>
+	System's directory for character maps : /usr/share/i18n/charmaps
+                       repertoire maps: /usr/share/i18n/repertoiremaps
+                       locale path    : /usr/lib/locale:/usr/share/i18n
+	</programlisting></para>
+
+	<para>
+	The 
+	<link linkend='charmaps_gloss'>charmaps</link>
+	and 
+	<link linkend='locale_gloss'>locale</link>
+	directories must exist and they should be populated with the appropriate files
+	before you move on. You need to look for these in your distro and copy them as
+	appropriate.
+	</para>
+
+	<para>
+	Now, find out if your favorite locale is in the archive:
+	</para>
+
+	<para><programlisting>
+	locale -a
+	</programlisting></para>
+
+	<para>If it is, you may continue on to the next chapter. Otherwise, you need to 
+	generate it. 
+	</para>
+	<para> For this example, let's assume you want to create en_US.utf8. Here's how:
+	</para>
+
+	<para><programlisting>
+	 localedef --no-archive -c -f UTF-8 -i en_US en_US.utf8
+	</programlisting></para>
+
+	<para>
+	Note the switch -c will force even if there are errors. For some reason this is important on the arm.
+	The --no-archive switch ensures that the files are put into their own directory.
+	</para>
+
+	<para>
+	Note, that this still isn't enough to have locale support. Let's check.
+	</para>
+
+	<para><programlisting>
+	locale -a
+	</programlisting></para>
+
+	<para><programlisting>
+	root@dm355evm:/# locale -a                                                      
+	C                                                                               
+	POSIX
+	en_US.utf8
+	</programlisting></para>
+
+	<para>
+	Now we can set the locale with the following:
+	</para>
+	
+	<para><programlisting>
+	export LANG=en_US.utf8
+	</programlisting></para>
+
+	<para>
+	The files can be found here:
+	<link linkend='usr_lib_locale'>/usr/lib/locale</link>
+	</para>
+	
+
+	</section>
+</chapter>
+
+<chapter id='setup_chap'>
+<title>Setting Up a Project for Internationalization</title>
+
+		<para>
+		Some basic assumptions before we start. First of all, we are going to translate
+		a project with a single file called 
+		<filename>
+		hello.c.
+		</filename> Next, we are going to start with English as our default language
+		and we are going to translate into a language that most people know to 
+		an extent, in this case Spanish. Because, Americans, in school, learn a 
+		mix of all the dialects, I'm going to call our version of Spanish American
+		Spanish. Thus the code I'm going to use is es_US.utf8. Where "es" is
+		Espanol, US is the regional dialect of Spanish, and utf8 UTF-8 (8-bit Unicode
+		Transformation Format) is a variable-length character encoding for Unicode 
+		which is the gold standard for internationalization for now.
+		</para>
+
+        <section>
+        <title>First I10n Steps</title>
+        <orderedlist numeration="arabic">
+
+		<listitem><para>
+		You are going to need a directory to put your translation files. This
+		is generally named <filename> po </filename>.
+		</para></listitem>
+
+		<listitem><para>
+		In order to help the build process extract all translatable strings,
+		there are two important files that you need to put in the
+		<filename>po</filename> 
+		subdirectory of your project — 
+		<filename>POTFILES.in</filename> 
+		and (possibly) 
+		<filename>POTFILES.skip</filename> 
+		</para>
+
+		<para>
+		We'll skip about 
+		<filename>POTFILES.skip</filename>
+		for now.
+		Place the names of all the filenames that potentially have translatable strings
+		into 
+		<filename>po/POTFILES.in.</filename> 
+		</para></listitem>
+
+		<listitem><para>
+		Next we need to make 
+		<filename>
+		hello.pot. 
+		</filename>
+		By doing this:
+		</para>
+			
+		<para>
+		<programlisting>
+		xgettext --language=C --keyword=_ --output=po/hello.pot hello.c
+		</programlisting>
+		</para>
+
+		<para>
+		Note that since we made the keyword an underscore, this means that the only
+		strings we are going to translate are the ones that are marked up. See the
+		section on "Marking Up Strings In C" for details.
+		</para>
+		</listitem>
+
+		<listitem><para>
+		Create the directory infrastructure. We are all ready in our 
+		<filename>
+		po
+		</filename>. We only have to make the other dirs.
+		</para>
+
+		<para><programlisting>
+		mkdir -p es_US.utf8/LC_MESSAGES	
+		</programlisting></para>
+		<para>
+		If you think that you probably need an
+		<filename>
+		LC_MESSAGES
+		</filename> for every single encoding, you would be right.
+		</para>
+		<para>
+		For example, for Spanish from Spain, lives in:
+		<filename>
+		po/es_ES.utf8/LC_MESSAGES	
+		</filename>
+		</para>
+		</listitem>
+
+		<listitem><para>
+		Copy the pot file to a new po file to the proper area of the directory tree.
+		In our case, we are sticking to the "hello" domain for our application.
+		Thus, we have (we are still in the po dir):
+		</para>
+		<para><programlisting>
+		cp hello.pot es_US.utf8/LC_MESSAGES/hello.po
+		</programlisting></para>
+		</listitem>
+		
+		<listitem><para>
+		In our new
+		<filename>
+		es_US.utf8/LC_MESSAGES/hello.po,
+		</filename>
+		translate all the messages marked msgstr (between quotes)  
+		that you care about. 
+		There are many good apps to use for this even on windows such as
+		<application>
+		poedit.
+		</application>
+		</para><para>
+		<programlisting><![CDATA[
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-08-16 15:59-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: hello.c:12 hello.c:14
+#, c-format
+msgid "Hello, world!\n"
+msgstr ""
+		]]></programlisting>
+		</para><para>
+		A few things about translating. First, don't put anything into empty strings.
+		Also, you need not translate all the strings, if the user doesn't see them.
+		Finally,  
+		<application>
+		xgettext
+		</application> is smart, and it will grab the line above each string, if there's 
+		a comment, so developers have a way to leave notes to translators while they code.
+		</para></listitem>
+
+		<listitem><para>
+		Once you are happy with the translation, you may generate the machine object (mo) 		   files from the completed po files:
+		<programlisting>
+	
+		msgfmt es_US.utf8/LC_MESSAGES/hello.po -o es_US.utf8/LC_MESSAGES/hello.mo
+		</programlisting>
+		</para><para>
+		You may want to put the last step into a Makefile.
+		</para></listitem>
+		
+		</orderedlist></section>
+</chapter>
+
+<chapter id='system_chap'>
+<title>Setting Up a Working Linux System for Internationalization</title>
+<section>
+<title>Language Support The Easy Way</title>
+<para>
+If you do all the other steps properly, but you do not have the proper locales
+support in your Linux system, gettext() still won't work.
+</para>
+<para>
+Most modern Linux distros allow you to click install a locale. For example, in Ubuntu Lucid, you merely go to Start->System->Administration->Language Support to install and
+configure the proper language.
+</para>
+<para>
+To find out what support you all ready have installed you may do:
+</para>
+<para><programlisting>
+locale -a
+</programlisting></para>
+<para>
+To test this change, you may do:
+</para>
+<para><programlisting>
+export LANG="es_US.utf8"
+</programlisting></para>
+<para>
+Now every program, that has US Spanish support, will talk to you in Spanish when 
+invoked from that console.
+</para>
+<para>
+If you have accomplished this, you are done and may skip the rest of this chapter, otherwise, read on.
+</para>
+</section>
+
+<section>
+<title>Language Support By Hand</title>
+<para>
+This section is for those who have a bare bones system w/o language support. In this case, we need to build the locales files by hand.
+</para>
+<para>
+</para>
+</section>
+</chapter>
+
+<chapter id='c_chap'>
+<title>Changes to C Sources</title>
+
+<section>
+	<title>Hola Munda International</title>
+	<para>
+	Once the directories are set up as in 
+	<link linkend='setup_chap'>the chapter on setup,</link>
+	the boilerplate changes necessary for localization are very simple. 
+	</para><para>
+	Sticking with our prior example, here's 
+	<filename>
+	hello.c,
+	</filename>
+	the simpliest program that uses localization:
+	</para>
+	<para>
+	<programlisting><![CDATA[
+#include <libintl.h>
+#include <locale.h>
+#include <stdio.h>
+#include <stdlib.h>
+#define _(STRING)    gettext(STRING)
+
+int main(void)
+{
+	// We start with the system default. It's probably better to save this somewhere.
+	setlocale( LC_ALL, "" );
+
+	/*	Here the 'hello' is the domain name while 'po' is the path to the po dir.
+		Not that this is a local path.	It's probably better to use a whole path 
+		(or a dynamic path) production
+		version.  */
+	bindtextdomain( "hello", "po" );
+
+	// I dunno why this is here. Looks redundant to me.
+	textdomain( "hello" );
+
+	// Sample print statement. This will come out as system default.
+	printf( _( "Hello, world!\n" ) );
+
+	// This will come out as Spanish, if the system default is different.
+	setlocale( LC_ALL, "es_ES.utf8" );
+	printf( _( "Hello, world!\n" ) );
+
+	exit(0);
+}
+	]]>
+	</programlisting>
+	</para>
+	</section>
+
+<section>
+	<title>Adding Internationalization to an Existing Project</title>
+	<para>
+	At the top of the project, include the following:
+	</para>
+
+	<para><programlisting><![CDATA[
+#include <libintl.h>
+#include <locale.h>
+#define _(STRING)    gettext(STRING)
+	]]></programlisting></para>
+
+	<para>
+	Aside from boilerplate includes, we make a shortcut for ourselves to save a lot of 
+	typing. Plus, the default command to grab important strings uses this.
+	</para>
+
+	<para>
+	Next, in the initialization part of the program--usually near main()--you must 
+	initialize locale:
+	</para>
+
+	<para><programlisting><![CDATA[
+setlocale( LC_ALL, "" );
+bindtextdomain( "hello", "/usr/local/share/po" );
+textdomain( "hello" );
+	]]></programlisting></para>
+
+	<para>
+	The first line will set the locale to the default.
+	If we wanted to hard code a language, such as our Americanized version of
+	Spanish as used in the example we can put in the code between the quotes:
+	</para>
+
+	<para><programlisting><![CDATA[
+setlocale( LC_ALL, "es_ES.utf8" );
+	]]></programlisting></para>
+
+	<para>
+	The second line uses our domain, which is "hello", and it sets the top level directory where our po files live. Note that we have to have our installer place our po (and mo) directory tree in the install path. Here we are using the default linux location.
+	</para><para>
+	Finally, the last line seems redundant. Just make sure the domain (hello) matches the one in the line above, and we are done.
+	</para><para>
+	We all we have to do is to find all the strings that we want to translate and wrap it with:
+	</para>
+	<para><programlisting><![CDATA[
+	_("");
+	]]></programlisting></para>
+	<para>
+	For example:
+	</para>
+	<para><programlisting><![CDATA[
+	printf( _( "Hello, world!\n" ) );
+	]]></programlisting></para>
+	
+	<para>
+	Now we can try the program. If we keep the locale the default, we get the 
+	traditional, "Hello world!". However, if we set the locale to es_US.utf8
+	either in the source code or by changing the lang environment variable 
+	in our bash shell:
+	</para>
+
+	<para><programlisting><![CDATA[
+	export LANG="es_US.utf8"
+	]]></programlisting></para>
+
+	<para>
+	Now we can rerun our program, and the real fun begins: "Hola Munda!" 
+	The sample program listing goes both ways to demonstrate that one can
+	change locale dynamically while a program runs.
+	</para>
+</section>
+
+	<section>
+	<title>Additional Notes on GTK</title>
+	<para>
+	GTK is a bit more difficult to deal with regarding internationalization.	
+	</para>
+	<para>
+	First of all, in all the international C files, you need to add this:
+	</para>
+	<para><programlisting><![CDATA[
+	#include <glib/gi18n.h>
+	]]></programlisting></para>
+
+	<para>
+	Fortunately, that's it. There are no other headers nor any defines you need to do
+	for underscore and so on so skip all that junk.
+	</para>
+
+	<para>
+	However, threading is often a mess, and you need to be careful where you actually bindtext() and textdomain(). I found that right before gtk_init() works for me, but then I setlocale() after this. I don't know why this is so, but this is the only thing that worked after a lot of trial and error.
+	</para>
+
+	<para>
+	Finally, you need this incantation for GTKBuilder GUI elements made in glade to be international. Note that I found that this has to be done after gtk_init(). 
+	</para>
+
+	<para><programlisting><![CDATA[
+	gtk_builder_set_translation_domain (Builder, "domain");
+	]]></programlisting></para>
+
+	<para>
+	Where domain is the domain you have been using for textdomain and bindtextdomain, and Builder is obviously your GTKBuilder object.
+	</para>
+
+	</section>
+
+
+
+</chapter>
+
+<chapter id='debug_chap'>
+<title>Debugging Internationalization</title>
+<section>
+	<title>!Ayudame! My Application Doesn't Speak Espanol! (Or any other language that I need)</title>
+	<para>
+	This is the most common problem with internationalization. There are two possible causes of this problem.
+	</para>
+	<para>
+	First of all, make sure that the application is internationalized properly. One way to test this is to rerun Hola Mundo Internacional. If this application works properly then it's possible that you are not internationalizing properly, and you need to go back and look making sure all your includes are set up properly as well as if your strings are wrapped properly.
+	</para>
+	<para>
+	If Hola Mundo works properly, the your poor application 
+	probably has problems finding out where your machine object (.mo) files live.
+	The quickest possible way to figure this out is by running strace.
+	For example:  
+	</para>
+	<para>
+	
+	</para>
+</section>
+</chapter>
+
+
+<appendix>
+<title>Other References Books and Articles</title>
+        <orderedlist numeration="arabic">
+
+		<listitem><para>
+		<ulink url="http://www.async.com.br/~kiko/gettext.html"><citetitle>
+		Internationalization Beginner's Tutorial (READ ME FIRST)
+		</citetitle></ulink>.
+		This is the best documentation for starting with internationalization.
+		</para></listitem>
+
+		<listitem><para>
+		<ulink url="http://www.gnu.org/software/gettext/manual/gettext.html#Importing"><citetitle>
+		GNU `gettext' utilities
+		</citetitle></ulink>.
+		</para></listitem>
+
+		<listitem><para>
+		<ulink url="http://www.heiner-eichmann.de/autotools/using_gettext.html"><citetitle>
+		Gettext: Adding a New Language With Autotools
+		</citetitle></ulink>.
+		</para></listitem>
+
+
+		<listitem><para>
+		<ulink url="http://www.ibm.com/developerworks/opensource/library/os-gtk2/index.html"><citetitle>
+		International GTK+
+		</citetitle></ulink>.
+		</para></listitem>
+
+		<listitem><para>
+		<ulink url="http://people.gnome.org/~malcolm/i18n/"><citetitle>
+		Gnome Internationalization
+		</citetitle></ulink>.
+		</para></listitem>
+
+		<listitem><para>
+		<ulink url="http://www.learningpython.com/2006/12/03/translating-your-pythonpygtk-application/"><citetitle>
+		Python Internationalization Tutorial
+		</citetitle></ulink>.
+		</para></listitem>
+
+		<listitem><para>
+		<ulink url="http://docs.python.org/library/gettext.html"><citetitle>
+		Python gettext API
+		</citetitle></ulink>.
+		</para></listitem>
+
+
+		<listitem><para>
+		<ulink url="http://www.opengroup.org/onlinepubs/009695399/toc.htm"><citetitle>
+		IEEE Std 1003.1, 2004 Edition
+		</citetitle></ulink>.
+		</para></listitem>
+
+		<listitem><para>
+		<ulink url="https://prioritiseapp.wordpress.com/tag/i18n"><citetitle>
+		Translating a pygtk application
+		</citetitle></ulink>.
+		</para></listitem>
+
+		<listitem><para>
+		<ulink url="http://publib.boulder.ibm.com/infocenter/wbihelp/v6rxmx/index.jsp?topic=/com.ibm.wbia_developer.doc/doc/connector_dev_cplusplus/cplus127.htm"><citetitle>
+		IBM: What is a Locale?
+		</citetitle></ulink>.
+		</para></listitem>
+
+		<listitem><para>
+		<ulink url="http://www.servin.com/linux/GladeInternationalization.html">
+		<citetitle>
+		GTK+, Glade, and Internationalization	
+		</citetitle></ulink>.
+		</para></listitem>
+
+		</orderedlist>
+
+</appendix>
+
+<glossary><title>Files For Internationization</title>
+<para></para>
+
+<glossdiv><title>Command Line Utilities</title>
+
+<glossentry id="locale"><glossterm>locale</glossterm>
+<glossdef>
+<para>
+A binary executable that writes information about the current locale environment, or
+all locales, to standard output.
+</para>
+</glossdef>
+</glossentry>
+
+<glossentry id="iconv"><glossterm>iconv</glossterm>
+<glossdef>
+<para>
+The iconv program converts text from one encoding to another encoding.
+</para>
+</glossdef>
+</glossentry>
+
+<glossentry id="localedef"><glossterm>localedef</glossterm>
+<glossdef>
+<para>
+A binary executable that  reads  the indicated charmap and input files,
+compiles them to a binary form quickly usable by the locale(7) functions in
+the  C  library.
+</para>
+</glossdef>
+</glossentry>
+
+<glossentry id="locale-gen"><glossterm>locale-gen</glossterm>
+<glossdef>
+<para>
+A shell script that generates locales files.
+</para>
+</glossdef>
+</glossentry>
+
+</glossdiv>
+
+<glossdiv><title>Config Files and Directories</title>
+
+<glossentry id="locale-archive"><glossterm>/usr/lib/locale/locale-archive</glossterm>
+<glossdef>
+<para> 
+A single file which contains all the locale data information on a system. The
+alternative is a deep tree where individual files are stored under
+<filename> 
+/usr/lib/locale/locale_name/LC_*
+</filename> 
+</para>
+</glossdef>
+</glossentry>
+
+<glossentry id="charmaps_gloss"><glossterm>/usr/share/i18n/charmaps</glossterm>
+<glossdef>
+<para> 
+Default path where the charmaps files live.
+</para>
+</glossdef>
+</glossentry>
+
+
+<glossentry id="locale_gloss"><glossterm>/usr/share/i18n/locale</glossterm>
+<glossdef>
+<para> 
+Default path where the locale files live.
+</para>
+</glossdef>
+</glossentry>
+
+
+<glossentry id="usr_lib_locale"><glossterm>/usr/lib/locale</glossterm>
+<glossdef>
+<para> 
+Where the generated files for the local live. Copying these should ensure the locale.
+</para>
+</glossdef>
+</glossentry>
+
+</glossdiv>
+
+
+<glossdiv><title>Tools</title>
+<glossentry id="gettext"><glossterm>gettext</glossterm>
+<glossdef>
+  <para>
+		A set of tools that provides a framework to help
+other GNU packages produce multi-lingual messages. These tools include a set of
+conventions about how programs should be written to support message catalogs, a
+directory and file naming organization for the message catalogs themselves, a
+runtime library supporting the retrieval of translated messages, and a few
+stand-alone programs to massage in various ways the sets of translatable
+strings, or already translated strings.
+  </para>
+</glossdef>
+</glossentry>
+</glossdiv>
+
+
+<glossdiv><title>Ubuntu Packages</title>
+
+<glossentry id="locale_deb"><glossterm>locale</glossterm>
+<glossdef>
+  <para>
+This package provides support for localized environments (locales). It installs character and transliteration maps, provides the POSIX locale definition and provides common scripts for language pack handling.
+
+The actual locale definitions are not part of this package, these are shipped in the language packs and are installed and removed automatically. 
+  </para>
+</glossdef>
+</glossentry>
+
+<glossentry id="localepurge_deb"><glossterm>localepurge</glossterm>
+<glossdef>
+  <para>
+This is a script to recover disk space wasted for unneeded locales, Gnome/KDE localizations and localized man pages. Depending on the installation, it is possible to save some 200, 300, or even more mega bytes of disk space dedicated for localization you will most probably never have any use for. It is run automagically upon completion of any apt installation actions. 
+  </para>
+</glossdef>
+</glossentry>
+
+</glossdiv>
+
+</glossary>
+</book>

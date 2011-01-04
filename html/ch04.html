@@ -1,0 +1,44 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Chapter 4. Changes to C Sources</title><meta name="generator" content="DocBook XSL Stylesheets V1.75.2"><link rel="home" href="index.html" title="GTK Internationalization For the Embedded Device"><link rel="up" href="index.html" title="GTK Internationalization For the Embedded Device"><link rel="prev" href="ch03s02.html" title="Language Support By Hand"><link rel="next" href="ch04s02.html" title="Adding Internationalization to an Existing Project"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div class="navheader"><table width="100%" summary="Navigation header"><tr><th colspan="3" align="center">Chapter 4. Changes to C Sources</th></tr><tr><td width="20%" align="left"><a accesskey="p" href="ch03s02.html">Prev</a> </td><th width="60%" align="center"> </th><td width="20%" align="right"> <a accesskey="n" href="ch04s02.html">Next</a></td></tr></table><hr></div><div class="chapter" title="Chapter 4. Changes to C Sources"><div class="titlepage"><div><div><h2 class="title"><a name="c_chap"></a>Chapter 4. Changes to C Sources</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="ch04.html#id2894722">Hola Munda International</a></span></dt><dt><span class="section"><a href="ch04s02.html">Adding Internationalization to an Existing Project</a></span></dt><dt><span class="section"><a href="ch04s03.html">Additional Notes on GTK</a></span></dt></dl></div><div class="section" title="Hola Munda International"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a name="id2894722"></a>Hola Munda International</h2></div></div></div><p>
+	Once the directories are set up as in 
+	<a class="link" href="ch02.html" title="Chapter 2. Setting Up a Project for Internationalization">the chapter on setup,</a>
+	the boilerplate changes necessary for localization are very simple. 
+	</p><p>
+	Sticking with our prior example, here's 
+	<code class="filename">
+	hello.c,
+	</code>
+	the simpliest program that uses localization:
+	</p><p>
+	</p><pre class="programlisting">
+#include &lt;libintl.h&gt;
+#include &lt;locale.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#define _(STRING)    gettext(STRING)
+
+int main(void)
+{
+	// We start with the system default. It's probably better to save this somewhere.
+	setlocale( LC_ALL, "" );
+
+	/*	Here the 'hello' is the domain name while 'po' is the path to the po dir.
+		Not that this is a local path.	It's probably better to use a whole path 
+		(or a dynamic path) production
+		version.  */
+	bindtextdomain( "hello", "po" );
+
+	// I dunno why this is here. Looks redundant to me.
+	textdomain( "hello" );
+
+	// Sample print statement. This will come out as system default.
+	printf( _( "Hello, world!\n" ) );
+
+	// This will come out as Spanish, if the system default is different.
+	setlocale( LC_ALL, "es_ES.utf8" );
+	printf( _( "Hello, world!\n" ) );
+
+	exit(0);
+}
+	
+	</pre><p>
+	</p></div></div><div class="navfooter"><hr><table width="100%" summary="Navigation footer"><tr><td width="40%" align="left"><a accesskey="p" href="ch03s02.html">Prev</a> </td><td width="20%" align="center"> </td><td width="40%" align="right"> <a accesskey="n" href="ch04s02.html">Next</a></td></tr><tr><td width="40%" align="left" valign="top">Language Support By Hand </td><td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td><td width="40%" align="right" valign="top"> Adding Internationalization to an Existing Project</td></tr></table></div></body></html>
